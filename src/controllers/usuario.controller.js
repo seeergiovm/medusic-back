@@ -12,7 +12,7 @@ export const getUsuario = async (req, res) => {
     console.log(rows[0])
 
     res.send('OK')
-    
+
   } catch (error) {
     console.error('Error al verificar el login:', error);
     res.status(500).json({ error: 'Error interno del servidor.' });
@@ -91,6 +91,24 @@ export const login = async (req, res) => {
 };
 
 
+export const buscarUsuarios = async (req, res) => {
+  try {
+    const { termino } = req.params;
+
+    const [usuarios] = await pool.query(
+      'SELECT idUsuario, username, profilePicture, rol FROM usuario WHERE username LIKE ?',
+      [`%${termino}%`]
+    );
+    console.log(termino)
+    console.log(usuarios);
+
+    res.json(usuarios);
+
+  } catch (error) {
+    console.error('Error al buscar usuarios:', error);
+    res.status(500).json({ error: 'Error interno del servidor.' });
+  }
+};
 
 
 
