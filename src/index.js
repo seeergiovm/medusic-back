@@ -1,22 +1,17 @@
 import express from 'express'
-import {pool}  from './db.js'
+import usuarioRoutes from './routes/usuario.routes.js'
+import indexRoutes from './routes/index.routes.js'
+import cors from 'cors'
 
-const app = express()
+const app = express();
 
-app.get('/ping', async (req, res) => {
-  // res.send('pong')
-  const [result] = await pool.query('SELECT 1 + 1 AS result')
-  res.json(result[0])
-});
+//Interpreta los datos como json
+app.use(express.json())
 
-app.get('/usuario', (req, res) => res.send('obteniendo usuarios'))
+app.use(cors());
 
-app.post('/usuario', (req, res) => res.send('creando usuarios'))
+app.use(indexRoutes);
+app.use(usuarioRoutes);
 
-app.put('/usuario', (req, res) => res.send('actualizar usuarios'))
-
-app.delete('/usuario', (req, res) => res.send('borrar usuarios'))
-
-
-app.listen(3000)
+app.listen(3000);
 console.log('Server running on port 3000');
