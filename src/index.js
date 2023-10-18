@@ -1,5 +1,6 @@
 import express from 'express'
 import cors from 'cors'
+import path from 'path';
 
 //Routes
 import usuarioRoutes from './routes/usuario.routes.js'
@@ -13,7 +14,11 @@ app.use(express.json())
 
 app.use(cors());
 
-app.use(indexRoutes);
+
+// Configuración para servir archivos estáticos desde la carpeta 'uploads'
+app.use('/uploads', express.static('uploads'));
+
+app.use(indexRoutes)
 app.use(usuarioRoutes);
 app.use(notificacionesRoutes)
 

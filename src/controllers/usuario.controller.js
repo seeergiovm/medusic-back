@@ -5,7 +5,8 @@ import jwt from 'jsonwebtoken';
 export const subirImagen = async (req, res) => {
   try {
     // obtener la ruta de la imagen en req.file.path
-    const rutaImagen = req.file.path;
+    const rutaImagen = req.file.path.replace(/\\/g, '/');
+    console.log(req.file.path);
     const idUsuario = req.body.idUsuario;
 
     await pool.query('START TRANSACTION');
