@@ -1,23 +1,74 @@
 import {pool} from '../db.js'
 import jwt from 'jsonwebtoken';
 
-export const getUsuario = async (req, res) => {
-  
+//PRUEBA
+export const subirImagen = async (req, res) => {
   try {
-    const {username} = req.body;
+    // obtener la ruta de la imagen en req.file.path
+    const rutaImagen = req.file.path;
+    const idUsuario = req.body.idUsuario;
+
+    await pool.query('START TRANSACTION');
+
+    const [rows] = await pool.query(`UPDATE usuario SET profilePicture=? WHERE idUsuario=?`
+    , [rutaImagen, idUsuario]);
+
+    console.log(rows)
+    if (rows.affectedRows === 0) {
+      return res.status(200).json({ error: 'No se ha actualizado la imagen de perfil del usuario' });
+    }
+    
+    await pool.query('COMMIT');
+
+    res.send('Imagen subida correctamente.');
+  } catch (error) {
+
+    await pool.query('ROLLBACK');
+
+    console.error('Error al subir la imagen:', error);
+    res.status(500).send('Error al subir la imagen.');
+  }
+}
+
+await pool.query('ROLLBACK');
+
+// CONTROL PETICIONES
+export const getUsuario = async (req, res) => {
+  try {
+    const {username} = req.params;
 
     const [rows] = await pool.query(`SELECT * FROM usuario WHERE username=?`, 
     [username]);
 
     console.log(rows[0])
 
-    res.send('OK')
+    res.send(rows[0])
 
   } catch (error) {
     console.error('Error al verificar el login:', error);
     res.status(500).json({ error: 'Error interno del servidor.' });
   }
 }
+
+export const getPerfilUsuario = async (req, res) => {
+  // TO DO
+  // try {
+  //   const { termino } = req.params;
+
+  //   const [usuarios] = await pool.query(
+  //     'SELECT idUsuario, username, profilePicture, rol FROM usuario WHERE username LIKE ?',
+  //     [`%${termino}%`]
+  //   );
+  //   console.log(termino)
+  //   console.log(usuarios);
+
+  //   res.json(usuarios);
+
+  // } catch (error) {
+  //   console.error('Error al buscar usuarios:', error);
+  //   res.status(500).json({ error: 'Error interno del servidor.' });
+  // }
+};
 
 export const createUsuario = async (req, res) => {
 
