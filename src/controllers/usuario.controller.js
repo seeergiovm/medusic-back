@@ -1,5 +1,6 @@
 import {pool} from '../db.js'
-import jwt from 'jsonwebtoken';
+import { generateToken } from '../services/authService.js'
+
 
 //PRUEBA
 export const subirImagen = async (req, res) => {
@@ -116,6 +117,7 @@ export const deleteUsuario = (req, res) => res.send('borrar usuarios')
 
 export const login = async (req, res) => {
   try {
+    console.log('LOGIN')
     const { username, password } = req.body;
 
     if (!username || !password) {
@@ -134,8 +136,11 @@ export const login = async (req, res) => {
 
     const usuario = rows[0];
 
+    // Genera un token
+    const token = generateToken(usuario.idUsuario);
+
     console.log(usuario);
-    res.send('OK');
+    res.send({token});
   } catch (error) {
     console.error('Error al verificar el login:', error);
     res.status(500).json({ error: 'Error interno del servidor.' });
