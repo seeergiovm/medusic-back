@@ -21,17 +21,17 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 
-router.get('/usuario/get/:username', getUsuario)
+router.get('/usuario/get/:idUsuario', getUsuario);
 
-router.get('/usuario/perfil/:idUsuario', getPerfilUsuario)
+router.get('/usuario/perfil/:idUsuario', getPerfilUsuario);
 
-router.post('/usuario/create', createUsuario)
+router.post('/usuario/create', upload.single('profilePicture'), createUsuario);
 
 router.post('/subir-imagen', upload.single('profilePicture'), subirImagen);
 
-router.put('/usuario', updateUsuario)
+router.put('/usuario/update', updateUsuario)
 
-router.delete('/usuario', deleteUsuario)
+router.delete('/usuario/delete', deleteUsuario)
 
 router.post('/login', login)
 
