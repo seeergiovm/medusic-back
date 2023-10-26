@@ -3,7 +3,7 @@ import multer from 'multer';
 import path from 'path';
 
 import { getUsuario, createUsuario, updateUsuario, deleteUsuario, login, 
-  buscarUsuarios, getPerfilUsuario, subirImagen} 
+  buscarUsuarios, getPerfilUsuario, subirImagen, recoverPassword} 
   from '../controllers/usuario.controller.js'
 
 const router = Router()
@@ -33,10 +33,10 @@ router.put('/usuario/update', updateUsuario)
 
 router.delete('/usuario/delete', deleteUsuario)
 
-router.post('/login', login)
+router.post('/login', login);
 
-router.get('/usuario/buscar/:termino', buscarUsuarios)
+router.get('/usuario/buscar/:termino', buscarUsuarios);
 
-
+router.get('/recover-password/:mail', recoverPassword);
 
 export default router

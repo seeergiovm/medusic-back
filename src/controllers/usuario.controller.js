@@ -1,8 +1,9 @@
 import {pool} from '../db.js'
-import { generateToken } from '../services/authService.js'
+import { generateToken, sendPasswordResetEmail } from '../utils/authUtils.js'
 
 
 //PRUEBA
+//Añade una imagen asociada a un usuario a la BD
 export const subirImagen = async (req, res) => {
   try {
     // obtener la ruta de la imagen en req.file.path
@@ -34,10 +35,8 @@ export const subirImagen = async (req, res) => {
 }
 
 
-
-await pool.query('ROLLBACK');
-
 // CONTROL PETICIONES
+//Devuelve info del usuario a traves de su ID
 export const getUsuario = async (req, res) => {
   try {
     const {idUsuario} = req.params;
@@ -55,6 +54,7 @@ export const getUsuario = async (req, res) => {
   }
 }
 
+// Devuelve toda la información del perfil de un usuario
 export const getPerfilUsuario = async (req, res) => {
   // TO DO
   // try {
@@ -75,6 +75,7 @@ export const getPerfilUsuario = async (req, res) => {
   // }
 };
 
+// Crea una cuenta de usuario
 export const createUsuario = async (req, res) => {
 
   try {
@@ -158,7 +159,7 @@ export const login = async (req, res) => {
     const usuario = rows[0];
 
     // Genera un token
-    const token = generateToken(usuario.idUsuario);
+    const token = generateToken(usuario.idUsuario, '5h');
 
     console.log(usuario);
     res.send({
@@ -172,6 +173,32 @@ export const login = async (req, res) => {
 };
 
 
+// Enviar correo con los datos de inicio de sesión
+export const recoverPassword = async (req, res) => {
+  try {
+    const { mail } = req.params;
+
+
+    const [rows] = await pool.query(`
+      SELECT username, fullname, passw FROM usuario WHERE mail=?`,
+      [mail]);
+
+    if (rows.length === 0) {
+      return res.status(400).json({ error: 'No existe ninguna cuenta asociada a ese correo electrónico.' });
+    }
+
+    let datosLogin = rows[0];
+
+    await sendPasswordResetEmail(mail, datosLogin);
+
+    res.status(200).json({ message: 'Se ha enviado un correo electrónico con los datos de su cuenta' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error interno del servidor.' });
+  }
+};
+
+// Busqueda filtrada de usuarios por nombre de usuario
 export const buscarUsuarios = async (req, res) => {
   try {
     const { termino } = req.params;
