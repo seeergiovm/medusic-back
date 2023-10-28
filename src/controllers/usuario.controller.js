@@ -108,10 +108,11 @@ export const createUsuario = async (req, res) => {
 
     //Añadir imagen
 
-    // No funciona
+    console.log("Archivo: " + req);
+
+    //No funciona
     // const rutaImagen = req.file.path.replace(/\\/g, '/');
     
-    // console.log("Archivo: " + req);
 
     // const idUsuario = result.insertId;
 
@@ -132,7 +133,45 @@ export const createUsuario = async (req, res) => {
   }
 }
 
-export const updateUsuario = (req, res) => res.send('actualizar usuarios')
+export const updateUsuario = async (req, res) => {
+  try {
+    const {idUsuario, username, fullname, rol, mail, country, biography} = req.body;
+
+    console.log(username, mail, fullname, country, biography, idUsuario)
+
+    let result;
+    if(rol === 'artista') {
+      const {artisticName, dedication, musicalGenres} = req.body;
+
+      [result] = await pool.query(`UPDATE usuario SET
+        username=?, mail=?, fullname=?, country=?, biography=?, artisticName=?, dedication=?, musicalGenres=?
+        WHERE (idUsuario=?)`,
+        [username, mail, fullname, country, biography, artisticName, dedication, musicalGenres, idUsuario]);
+
+    } else {
+      const {favsArtists} = req.body;
+      
+      [result] = await pool.query(`UPDATE usuario SET
+        username=?, mail=?, fullname=?, country=?, biography=?, favsArtists=?
+        WHERE (idUsuario=?)`, 
+      [username, mail, fullname, country, biography, favsArtists, idUsuario]);
+    }
+
+
+    console.log(result)
+
+    if (result.affectedRows > 0) {
+      res.status(200).json({ message: 'Actualización exitosa.' });
+    } else {
+      res.status(200).json({ message: 'No se realizaron cambios.' });
+    }
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error interno del servidor.' });
+  }
+
+}
 
 export const deleteUsuario = (req, res) => res.send('borrar usuarios')
 

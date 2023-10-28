@@ -29,7 +29,7 @@ router.post('/usuario/create', upload.single('profilePicture'), createUsuario);
 
 router.post('/subir-imagen', upload.single('profilePicture'), subirImagen);
 
-router.put('/usuario/update', updateUsuario)
+router.post('/usuario/update', updateUsuario);
 
 router.delete('/usuario/delete', deleteUsuario)
 
