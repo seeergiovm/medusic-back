@@ -33,7 +33,7 @@ router.post('/usuario/update-perfil', updateUsuario);
 
 router.post('/usuario/update-password', updatePassword);
 
-router.delete('/usuario/delete', deleteUsuario)
+router.get('/usuario/delete/:idUsuario', deleteUsuario);
 
 router.post('/login', login);
 

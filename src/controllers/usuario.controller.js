@@ -209,7 +209,35 @@ export const updatePassword = async (req, res) => {
 
 }
 
-export const deleteUsuario = (req, res) => res.send('borrar usuarios')
+export const deleteUsuario = async (req, res) => {
+  try {
+    const {idUsuario} = req.params;
+
+    console.log(idUsuario)
+
+    let rows, result;
+
+    [rows] = await pool.query('SELECT * FROM usuario WHERE idUsuario = ?', [idUsuario]);
+
+    if (!rows.length) {
+      return res.status(404).json({ message: 'El usuario no existe.' });
+    }
+
+    // Eliminar el usuario
+    [result] = await pool.query('DELETE FROM usuario WHERE idUsuario = ?', [idUsuario]);
+
+    if (result.affectedRows > 0) {
+      res.status(200).json({ message: 'Su cuenta ha sido eliminada correctamente.' });
+    } else {
+      res.status(200).json({ message: 'No se ha podido eliminar la cuenta' });
+    }
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error interno del servidor.' });
+  }
+
+}
 
 
 export const login = async (req, res) => {
