@@ -161,7 +161,43 @@ export const updateUsuario = async (req, res) => {
     console.log(result)
 
     if (result.affectedRows > 0) {
-      res.status(200).json({ message: 'Actualización exitosa.' });
+      res.status(200).json({ message: 'Se han actualizado los datos correctamente.' });
+    } else {
+      res.status(200).json({ message: 'No se realizaron cambios.' });
+    }
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error interno del servidor.' });
+  }
+
+}
+
+// Actualizar contraseña usuario
+export const updatePassword = async (req, res) => {
+  try {
+    const {idUsuario, oldPassword, newPassword} = req.body;
+
+    console.log(idUsuario, oldPassword, newPassword)
+
+    let rows, result;
+
+    [rows] = await pool.query(`SELECT passw FROM usuario WHERE idUsuario=?`,
+      [idUsuario]);
+
+    console.log('Introducida:' + oldPassword +' real:' + rows[0].passw);
+    
+    if(!rows.length ||oldPassword !== rows[0].passw) {
+      return res.status(200).json({ message: 'La contraseña actual no es correcta.' });
+    }
+
+    [result] = await pool.query(`UPDATE usuario SET passw=? WHERE (idUsuario=?)`,
+      [newPassword, idUsuario]);
+
+    console.log(result)
+
+    if (result.affectedRows > 0) {
+      res.status(200).json({ message: 'Se ha actualizado la contraseña correctamente.' });
     } else {
       res.status(200).json({ message: 'No se realizaron cambios.' });
     }

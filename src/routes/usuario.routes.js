@@ -3,7 +3,7 @@ import multer from 'multer';
 import path from 'path';
 
 import { getUsuario, createUsuario, updateUsuario, deleteUsuario, login, 
-  buscarUsuarios, getPerfilUsuario, subirImagen, recoverPassword} 
+  buscarUsuarios, getPerfilUsuario, subirImagen, recoverPassword, updatePassword } 
   from '../controllers/usuario.controller.js'
 
 const router = Router()
@@ -29,7 +29,9 @@ router.post('/usuario/create', upload.single('profilePicture'), createUsuario);
 
 router.post('/subir-imagen', upload.single('profilePicture'), subirImagen);
 
-router.post('/usuario/update', updateUsuario);
+router.post('/usuario/update-perfil', updateUsuario);
+
+router.post('/usuario/update-password', updatePassword);
 
 router.delete('/usuario/delete', deleteUsuario)
 
