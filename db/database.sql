@@ -13,7 +13,7 @@ CREATE TABLE Usuario (
     birthday DATE,
     country VARCHAR(255),
     biography TEXT,
-    profilePicture VARCHAR(255),
+    profilePicture MEDIUMTEXT,
     creationDate DATE,
     artisticName VARCHAR(255),
     dedication VARCHAR(255),
@@ -46,7 +46,7 @@ CREATE TABLE Evento (
     ubication VARCHAR(255),
     musicalGenres VARCHAR(255),
     descripcion TEXT,
-    img VARCHAR(255),
+    img MEDIUMTEXT,
     ticketLink VARCHAR(500),
     idUsuario INT,
     FOREIGN KEY (idUsuario) REFERENCES Usuario(idUsuario)
@@ -77,7 +77,7 @@ CREATE TABLE Publicacion (
     idPublicacion INT PRIMARY KEY AUTO_INCREMENT,
     publicationDate DATETIME,
     descripcion TEXT,
-    attachedFile VARCHAR(255),
+    attachedFile MEDIUMTEXT,
     idUsuario INT,
     FOREIGN KEY (idUsuario) REFERENCES Usuario(idUsuario) ON DELETE CASCADE
 );

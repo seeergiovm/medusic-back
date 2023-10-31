@@ -6,16 +6,13 @@ import { generateToken, sendPasswordResetEmail } from '../utils/authUtils.js'
 //Añade una imagen asociada a un usuario a la BD
 export const subirImagen = async (req, res) => {
   try {
-    // obtener la ruta de la imagen en req.file.path
-    console.log(req.file);
 
-    const rutaImagen = req.file.path.replace(/\\/g, '/');
-    const idUsuario = req.body.idUsuario;
+    const { profilePicture, idUsuario }= req.body;
 
     await pool.query('START TRANSACTION');
 
     const [rows] = await pool.query(`UPDATE usuario SET profilePicture=? WHERE idUsuario=?`
-    , [rutaImagen, idUsuario]);
+    , [profilePicture, idUsuario]);
 
     console.log(rows)
     if (rows.affectedRows === 0) {
@@ -79,51 +76,34 @@ export const getPerfilUsuario = async (req, res) => {
 export const createUsuario = async (req, res) => {
 
   try {
-    const {username, fullname, password, rol, mail, birthday, country, biography, creationDate} = req.body;
+    const {username, fullname, password, rol, mail, birthday, country, profilePicture, biography, creationDate} = req.body;
 
     let result;
     if(rol === 'artista') {
       const {artisticName, dedication, musicalGenres} = req.body;
 
       [result] = await pool.query(`INSERT INTO usuario (
-        username, fullname, passw, rol, mail, birthday, country, biography,
+        username, fullname, passw, rol, mail, birthday, country, profilePicture, biography,
         creationDate, artisticName, dedication, musicalGenres
       ) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, 
-      [username, fullname, password, rol, mail, birthday, country, biography, creationDate, artisticName, dedication, musicalGenres]);
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, 
+      [username, fullname, password, rol, mail, birthday, country, profilePicture, biography, creationDate, artisticName, dedication, musicalGenres]);
 
     } else {
       const {favsArtists} = req.body;
       
       [result] = await pool.query(`INSERT INTO usuario (
-        username, fullname, passw, rol, mail, birthday, country, biography,
+        username, fullname, passw, rol, mail, birthday, country, profilePicture, biography,
         creationDate, favsArtists
       ) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, 
-      [username, fullname, password, rol, mail, birthday, country, biography, creationDate, favsArtists]);
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, 
+      [username, fullname, password, rol, mail, birthday, country, profilePicture, biography, creationDate, favsArtists]);
     }
 
     console.log(result)
-    console.log(username, fullname, password, rol, mail, birthday, country, biography, creationDate)
-
-    //Añadir imagen
+    console.log(username, fullname, password, rol, mail, birthday, country, profilePicture, biography, creationDate)
 
     console.log("Archivo: " + req);
-
-    //No funciona
-    // const rutaImagen = req.file.path.replace(/\\/g, '/');
-    
-
-    // const idUsuario = result.insertId;
-
-    // const [rows] = await pool.query(`UPDATE usuario SET profilePicture=? WHERE idUsuario=?`
-    // , [rutaImagen, idUsuario]);
-
-    // console.log(rows)
-    // if (rows.affectedRows === 0) {
-    //   return res.status(200).json({ error: 'No se ha actualizado la imagen de perfil del usuario' });
-    // }
-    
 
     res.send('OK')
 
