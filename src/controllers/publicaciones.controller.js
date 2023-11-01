@@ -52,3 +52,81 @@ export const getPublicacion = async (req, res) => {
     res.status(500).json({ error: 'Error interno del servidor.' });
   }
 };
+
+// Verifica si un usuario ha dado like a una publicación
+export const verifyLike = async (req, res) => {
+
+  try {
+    const { idUsuario, idPublicacion } = req.body;
+
+    console.log(idUsuario, idPublicacion)
+
+    const [rows] = await pool.query(
+      `SELECT * FROM MeGusta WHERE idUsuario = ? AND idPublicacion = ?`,
+      [idUsuario, idPublicacion]
+    );
+
+    console.log(rows)
+
+    if(rows.length > 0) {
+      res.send({ hasLiked: true });
+    } else {
+      res.send({ hasLiked: false });
+    }
+
+  } catch (error) { 
+    console.error('Error al agregar like:', error);
+    res.status(500).json({ error: 'Error interno del servidor.' });
+  }
+}
+
+// Agrega el like de un usuario a una publicación
+export const addLike = async (req, res) => {
+
+  try {
+    const { idUsuario, idPublicacion } = req.body;
+
+    console.log(idUsuario, idPublicacion)
+
+    let result;
+
+    [result] = await pool.query(`INSERT INTO megusta (
+      idUsuario, idPublicacion
+    ) 
+    VALUES (?, ?)`, 
+    [idUsuario, idPublicacion]);
+
+    console.log(result)
+
+    res.send('OK')
+
+  } catch (error) { 
+    console.error('Error al agregar like:', error);
+    res.status(500).json({ error: 'Error interno del servidor.' });
+  }
+}
+
+// Agrega el like de un usuario a una publicación
+export const removeLike = async (req, res) => {
+
+  try {
+    const { idUsuario, idPublicacion } = req.body;
+
+    console.log(idUsuario, idPublicacion)
+
+    let result;
+
+    [result] = await pool.query(
+      `DELETE FROM megusta WHERE idUsuario = ? AND idPublicacion = ?`,
+      [idUsuario, idPublicacion]
+    );
+
+    console.log(result)
+
+    res.send('Se ha eliminado el like')
+
+  } catch (error) { 
+    console.error('Error al elimnar like:', error);
+    res.status(500).json({ error: 'Error interno del servidor.' });
+  }
+}
