@@ -1,7 +1,7 @@
 import {Router} from 'express'
 
 import { createPublicacion, getPublicacion, addLike, removeLike,
-    verifyLike } 
+    verifyLike, addComentario } 
   from '../controllers/publicaciones.controller.js'
 
 const router = Router()
@@ -15,6 +15,8 @@ router.post('/publicacion/verify-like', verifyLike);
 router.post('/publicacion/add-like', addLike);
 
 router.post('/publicacion/remove-like', removeLike);
+
+router.post('/publicacion/comentario/new', addComentario);
 
 
 

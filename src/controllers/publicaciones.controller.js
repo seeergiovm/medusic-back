@@ -32,7 +32,7 @@ export const getPublicacion = async (req, res) => {
   try {
     const {idPublicacion} = req.params;
 
-    const [rows] = await pool.query(
+    const [rowsPublicacion] = await pool.query(
       `SELECT 
         usuario.username, 
         usuario.profilePicture, 
@@ -46,7 +46,21 @@ export const getPublicacion = async (req, res) => {
       [idPublicacion]
     );
 
-    const publicacion = rows[0];
+    const publicacion = rowsPublicacion[0];
+
+    const [rowsComentarios] = await pool.query(
+      `SELECT comenta.*, usuario.username 
+      FROM comenta 
+      LEFT JOIN usuario ON comenta.idUsuario = usuario.idUsuario
+      WHERE comenta.idPublicacion = ?
+      ORDER BY comenta.commentDate DESC;`,
+      [idPublicacion]
+    );
+
+    const comentarios = rowsComentarios;
+
+    // Agregar la lista de comentarios al objeto de la publicación
+    publicacion.comentarios = comentarios;
 
     console.log(publicacion);
 
@@ -133,5 +147,31 @@ export const removeLike = async (req, res) => {
   } catch (error) { 
     console.error('Error al elimnar like:', error);
     res.status(500).json({ error: 'Error interno del servidor: Error al eliminar un  like' });
+  }
+}
+
+// Crea un nuevo comentario asociado a una publicacion
+export const addComentario = async (req, res) => {
+
+  try {
+    const { idUsuario, idPublicacion, comment, commentDate } = req.body;
+
+    console.log(idUsuario, idPublicacion, comment, commentDate)
+
+    let result;
+
+    [result] = await pool.query(`INSERT INTO comenta (
+      idUsuario, idPublicacion, comment, commentDate
+    ) 
+    VALUES (?, ?, ?, ?)`, 
+    [idUsuario, idPublicacion, comment, commentDate]);
+
+    console.log(result)
+
+    res.send({message:'OK'})
+
+  } catch (error) { 
+    console.error('Error al crear un comentario:', error);
+    res.status(500).json({ error: 'Error interno del servidor: Creando comentario' });
   }
 }
