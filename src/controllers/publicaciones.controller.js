@@ -32,12 +32,17 @@ export const getPublicacion = async (req, res) => {
   try {
     const {idPublicacion} = req.params;
 
-    //TODO
-
     const [rows] = await pool.query(
-      `SELECT usuario.username, usuario.profilePicture, publicacion.* FROM publicacion
-       LEFT JOIN usuario ON publicacion.idUsuario = usuario.idUsuario
-       WHERE publicacion.idPublicacion=?`,
+      `SELECT 
+        usuario.username, 
+        usuario.profilePicture, 
+        publicacion.*,
+        COUNT(megusta.idUsuario) AS likesCount
+      FROM publicacion
+      LEFT JOIN usuario ON publicacion.idUsuario = usuario.idUsuario
+      LEFT JOIN megusta ON publicacion.idPublicacion = megusta.idPublicacion
+      WHERE publicacion.idPublicacion=?
+      GROUP BY publicacion.idPublicacion`,
       [idPublicacion]
     );
 
@@ -96,13 +101,13 @@ export const addLike = async (req, res) => {
     VALUES (?, ?)`, 
     [idUsuario, idPublicacion]);
 
-    console.log(result)
+    console.log(result);
 
-    res.send('OK')
+    res.send({message:'OK: addLike'});
 
   } catch (error) { 
     console.error('Error al agregar like:', error);
-    res.status(500).json({ error: 'Error interno del servidor.' });
+    // res.status(500).json({ error: 'Error interno del servidor: Error al agregar un like' });
   }
 }
 
@@ -121,12 +126,12 @@ export const removeLike = async (req, res) => {
       [idUsuario, idPublicacion]
     );
 
-    console.log(result)
+    console.log(result);
 
-    res.send('Se ha eliminado el like')
+    res.send({message:'OK: removeLike'});
 
   } catch (error) { 
     console.error('Error al elimnar like:', error);
-    res.status(500).json({ error: 'Error interno del servidor.' });
+    res.status(500).json({ error: 'Error interno del servidor: Error al eliminar un  like' });
   }
 }
