@@ -78,6 +78,7 @@ CREATE TABLE Publicacion (
     publicationDate DATETIME,
     descripcion TEXT,
     attachedFile MEDIUMTEXT,
+    isEvent VARCHAR(50),
     idUsuario INT,
     FOREIGN KEY (idUsuario) REFERENCES Usuario(idUsuario) ON DELETE CASCADE
 );

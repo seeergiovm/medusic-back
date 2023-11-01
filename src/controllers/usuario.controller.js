@@ -53,23 +53,35 @@ export const getUsuario = async (req, res) => {
 
 // Devuelve toda la información del perfil de un usuario
 export const getPerfilUsuario = async (req, res) => {
-  // TO DO
-  // try {
-  //   const { termino } = req.params;
+  try {
+    const {idUsuario} = req.params;
 
-  //   const [usuarios] = await pool.query(
-  //     'SELECT idUsuario, username, profilePicture, rol FROM usuario WHERE username LIKE ?',
-  //     [`%${termino}%`]
-  //   );
-  //   console.log(termino)
-  //   console.log(usuarios);
+    const [rows] = await pool.query(
+      `SELECT usuario.*, publicacion.* FROM usuario
+       LEFT JOIN publicacion ON usuario.idUsuario = Publicacion.idUsuario
+       WHERE usuario.idUsuario=?`,
+      [idUsuario]
+    );
 
-  //   res.json(usuarios);
+    const usuarioConPublicaciones = {
+      usuario: rows[0],  // Detalles del usuario
+      publicaciones: rows.map(row => ({
+        idPublicacion: row.idPublicacion,
+        publicationDate: row.publicationDate,
+        descripcion: row.descripcion,
+        attachedFile: row.attachedFile,
+        isEvent: row.isEvent
+      })),
+    };
 
-  // } catch (error) {
-  //   console.error('Error al buscar usuarios:', error);
-  //   res.status(500).json({ error: 'Error interno del servidor.' });
-  // }
+    console.log(usuarioConPublicaciones);
+
+    res.send(usuarioConPublicaciones)
+
+  } catch (error) {
+    console.error('Error al obtener detalles del usuario y sus publicaciones:', error);
+    res.status(500).json({ error: 'Error interno del servidor.' });
+  }
 };
 
 // Crea una cuenta de usuario
