@@ -56,16 +56,34 @@ export const getPerfilUsuario = async (req, res) => {
   try {
     const {idUsuario} = req.params;
 
-    const [rows] = await pool.query(
-      `SELECT usuario.*, publicacion.* FROM usuario
-       LEFT JOIN publicacion ON usuario.idUsuario = Publicacion.idUsuario
-       WHERE usuario.idUsuario=?`,
+    const [rowsUsuario] = await pool.query(
+      'SELECT * FROM usuario WHERE idUsuario = ?',
+      [idUsuario]
+    );
+
+    const [rowsPublicaciones] = await pool.query(
+      'SELECT * FROM publicacion WHERE idUsuario = ?',
+      [idUsuario]
+    );
+
+    const [rowsSeguidos] = await pool.query(
+      'SELECT COUNT(*) AS numSeguidos FROM sigue WHERE idUsuarioSigue = ?',
+      [idUsuario]
+    );
+    
+    const [rowsSeguidores] = await pool.query(
+      'SELECT COUNT(*) AS numSeguidores FROM sigue WHERE idUsuarioSeguido = ?',
       [idUsuario]
     );
 
     const usuarioConPublicaciones = {
-      usuario: rows[0],  // Detalles del usuario
-      publicaciones: rows.map(row => ({
+      usuario: {
+        ...rowsUsuario[0],
+        numPublicaciones: rowsPublicaciones.length,
+        numSeguidos: rowsSeguidos[0].numSeguidos,
+        numSeguidores: rowsSeguidores[0].numSeguidores
+      }, 
+      publicaciones: rowsPublicaciones.map(row => ({
         idPublicacion: row.idPublicacion,
         publicationDate: row.publicationDate,
         descripcion: row.descripcion,
@@ -296,11 +314,11 @@ export const recoverPassword = async (req, res) => {
 // Busqueda filtrada de usuarios por nombre de usuario
 export const buscarUsuarios = async (req, res) => {
   try {
-    const { termino } = req.params;
+    const { termino, idUsuarioLoggeado } = req.params;
 
     const [usuarios] = await pool.query(
-      'SELECT idUsuario, username, profilePicture, rol FROM usuario WHERE username LIKE ?',
-      [`%${termino}%`]
+      'SELECT idUsuario, username, profilePicture, rol FROM usuario WHERE username LIKE ? AND idUsuario != ?',
+      [`%${termino}%`, idUsuarioLoggeado]
     );
     console.log(termino)
     console.log(usuarios);

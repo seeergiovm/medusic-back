@@ -23,7 +23,7 @@ router.get('/usuario/delete/:idUsuario', deleteUsuario);
 
 router.post('/login', login);
 
-router.get('/usuario/buscar/:termino', buscarUsuarios);
+router.get('/usuario/buscar/:termino/:idUsuarioLoggeado', buscarUsuarios);
 
 router.get('/recover-password/:mail', recoverPassword);
 
