@@ -18,7 +18,7 @@ export const createPublicacion = async (req, res) => {
 
     console.log(result)
 
-    res.send('OK')
+    res.send({message:'OK'})
 
   } catch (error) { 
     console.error('Error al crear el usuario:', error);
