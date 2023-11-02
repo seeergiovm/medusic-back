@@ -33,7 +33,7 @@ export const subirImagen = async (req, res) => {
 
 
 // CONTROL PETICIONES
-//Devuelve info del usuario a traves de su ID
+// Devuelve info del usuario a traves de su ID (para editar perfil)
 export const getUsuario = async (req, res) => {
   try {
     const {idUsuario} = req.params;
@@ -115,6 +115,86 @@ export const getPerfilUsuario = async (req, res) => {
     res.status(500).json({ error: 'Error interno del servidor.' });
   }
 };
+
+// Verifica si un usuario ha dado seguir a otro usuario
+export const verifyFollow = async (req, res) => {
+
+  try {
+    const { idUsuarioLogged, idUsuarioOtro } = req.body;
+
+    console.log(idUsuarioLogged, idUsuarioOtro)
+
+    const [rows] = await pool.query(
+      `SELECT * FROM Sigue WHERE idUsuarioSigue = ? AND idUsuarioSeguido = ?`,
+      [idUsuarioLogged, idUsuarioOtro]
+    );
+
+    console.log(rows)
+
+    if(rows.length > 0) {
+      res.send({ hasFollow: true });
+    } else {
+      res.send({ hasFollow: false });
+    }
+
+  } catch (error) { 
+    console.error('Error al verificar el follow:', error);
+    res.status(500).json({ error: 'Error interno del servidor.' });
+  }
+}
+
+// Agrega el follow de un usuario a otro usuario
+export const addFollow = async (req, res) => {
+
+  try {
+    const { idUsuarioLogged, idUsuarioOtro } = req.body;
+
+    console.log(idUsuarioLogged, idUsuarioOtro)
+
+    let result;
+
+    [result] = await pool.query(`INSERT INTO sigue (
+      idUsuarioSigue, idUsuarioSeguido
+    ) 
+    VALUES (?, ?)`, 
+    [idUsuarioLogged, idUsuarioOtro]);
+
+    console.log(result);
+
+    res.send({message:'OK: addFollow'});
+
+  } catch (error) { 
+    console.error('Error al agregar follow:', error);
+    // res.status(500).json({ error: 'Error interno del servidor: Error al agregar un follow' });
+  }
+}
+
+// Agrega el like de un usuario a una publicación
+export const removeFollow = async (req, res) => {
+
+  try {
+    const { idUsuarioLogged, idUsuarioOtro } = req.body;
+
+    console.log(idUsuarioLogged, idUsuarioOtro)
+
+    let result;
+
+    [result] = await pool.query(
+      `DELETE FROM sigue WHERE idUsuarioSigue = ? AND idUsuarioSeguido = ?`,
+      [idUsuarioLogged, idUsuarioOtro]
+    );
+
+    console.log(result);
+
+    res.send({message:'OK: removeFollow'});
+
+  } catch (error) { 
+    console.error('Error al elimnarfollow:', error);
+    res.status(500).json({ error: 'Error interno del servidor: Error al eliminar un follow' });
+  }
+}
+
+
 
 // Crea una cuenta de usuario
 export const createUsuario = async (req, res) => {
