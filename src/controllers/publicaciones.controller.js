@@ -257,3 +257,164 @@ export const getPublicacionMisSeguidores = async (req, res) => {
     res.status(500).json({ error: 'Error interno del servidor.' });
   }
 };
+
+// Devuelve las publicaciones en la sección de Explorar
+export const getPublicacionExplorar = async (req, res) => {
+  try {
+    const { idUsuarioLogged, idsVistos} = req.body;
+
+    console.log('explorar')
+    //Control de no repetir publicaciones ya vistas
+    const exclusionCondition = idsVistos.length > 0 ? `AND publicacion.idPublicacion NOT IN (${idsVistos.map(() => "?").join(",")})` : "";
+
+    // Obtener la publicación
+    const [resultPublicaciones] = await pool.query(
+      `SELECT 
+        usuario.username, 
+        usuario.profilePicture, 
+        publicacion.*,
+        COUNT(megusta.idUsuario) AS likesCount
+      FROM publicacion
+      LEFT JOIN usuario ON publicacion.idUsuario = usuario.idUsuario
+      LEFT JOIN megusta ON publicacion.idPublicacion = megusta.idPublicacion
+      WHERE publicacion.publicationDate >= NOW() - INTERVAL 1 WEEK
+        AND publicacion.idUsuario != ?
+        ${exclusionCondition}
+      GROUP BY publicacion.idPublicacion
+      ORDER BY RAND() * COUNT(*)
+      LIMIT 1;
+      `,
+      [idUsuarioLogged, ...idsVistos]
+    );
+
+    if (resultPublicaciones.length === 0) {
+      const [resultPublicaciones2] = await pool.query(
+        `SELECT 
+          usuario.username, 
+          usuario.profilePicture, 
+          publicacion.*,
+          COUNT(megusta.idUsuario) AS likesCount
+        FROM publicacion
+        LEFT JOIN usuario ON publicacion.idUsuario = usuario.idUsuario
+        LEFT JOIN megusta ON publicacion.idPublicacion = megusta.idPublicacion
+        WHERE publicacion.publicationDate >= NOW() - INTERVAL 4 WEEK
+          AND publicacion.idUsuario != ?
+          ${exclusionCondition}
+        GROUP BY publicacion.idPublicacion
+        ORDER BY RAND() * COUNT(*)
+        LIMIT 1;
+        `,
+        [idUsuarioLogged, ...idsVistos]
+      );
+      
+      if (resultPublicaciones2.length === 0) {
+        res.status(404).json({ message: 'No hay publicaciones posteriores.' });
+        return;
+      }
+    }
+
+    const siguientePublicacion = resultPublicaciones[0];
+    const idPublicacion = siguientePublicacion.idPublicacion;
+
+    const [rowsComentarios] = await pool.query(
+      `SELECT comenta.*, usuario.username 
+      FROM comenta 
+      LEFT JOIN usuario ON comenta.idUsuario = usuario.idUsuario
+      WHERE comenta.idPublicacion = ?
+      ORDER BY comenta.commentDate DESC;`,
+      [idPublicacion]
+    );
+
+    const comentarios = rowsComentarios;
+
+    // Agregar la lista de comentarios al objeto de la publicación
+    siguientePublicacion.comentarios = comentarios;
+
+    res.json(siguientePublicacion);
+  } catch (error) {
+    console.error('Error al obtener siguiente publicación:', error);
+    res.status(500).json({ error: 'Error interno del servidor.' });
+  }
+};
+
+
+// Devuelve las publicaciones en la sección de Explorar
+export const getPublicacionConciertos = async (req, res) => {
+  try {
+    const { idUsuarioLogged, idsVistos} = req.body;
+
+    console.log('conciertos')
+    //Control de no repetir publicaciones ya vistas
+    const exclusionCondition = idsVistos.length > 0 ? `AND publicacion.idPublicacion NOT IN (${idsVistos.map(() => "?").join(",")})` : "";
+
+    // Obtener la publicación
+    const [resultPublicaciones] = await pool.query(
+      `SELECT 
+        usuario.username, 
+        usuario.profilePicture, 
+        publicacion.*,
+        COUNT(megusta.idUsuario) AS likesCount
+      FROM publicacion
+      LEFT JOIN usuario ON publicacion.idUsuario = usuario.idUsuario
+      LEFT JOIN megusta ON publicacion.idPublicacion = megusta.idPublicacion
+      WHERE publicacion.publicationDate >= NOW() - INTERVAL 1 WEEK
+        AND publicacion.idUsuario != ?
+        AND publicacion.isEvent='Si'
+        ${exclusionCondition}
+      GROUP BY publicacion.idPublicacion
+      ORDER BY RAND() * COUNT(*)
+      LIMIT 1;
+      `,
+      [idUsuarioLogged, ...idsVistos]
+    );
+
+    if (resultPublicaciones.length === 0) {
+      const [resultPublicaciones2] = await pool.query(
+        `SELECT 
+          usuario.username, 
+          usuario.profilePicture, 
+          publicacion.*,
+          COUNT(megusta.idUsuario) AS likesCount
+        FROM publicacion
+        LEFT JOIN usuario ON publicacion.idUsuario = usuario.idUsuario
+        LEFT JOIN megusta ON publicacion.idPublicacion = megusta.idPublicacion
+        WHERE publicacion.publicationDate >= NOW() - INTERVAL 4 WEEK
+          AND publicacion.idUsuario != ?
+          AND publicacion.isEvent='Si'
+          ${exclusionCondition}
+        GROUP BY publicacion.idPublicacion
+        ORDER BY RAND() * COUNT(*)
+        LIMIT 1;
+        `,
+        [idUsuarioLogged, ...idsVistos]
+      );
+      
+      if (resultPublicaciones2.length === 0) {
+        res.status(404).json({ message: 'No hay publicaciones posteriores.' });
+        return;
+      }
+    }
+
+    const siguientePublicacion = resultPublicaciones[0];
+    const idPublicacion = siguientePublicacion.idPublicacion;
+
+    const [rowsComentarios] = await pool.query(
+      `SELECT comenta.*, usuario.username 
+      FROM comenta 
+      LEFT JOIN usuario ON comenta.idUsuario = usuario.idUsuario
+      WHERE comenta.idPublicacion = ?
+      ORDER BY comenta.commentDate DESC;`,
+      [idPublicacion]
+    );
+
+    const comentarios = rowsComentarios;
+
+    // Agregar la lista de comentarios al objeto de la publicación
+    siguientePublicacion.comentarios = comentarios;
+
+    res.json(siguientePublicacion);
+  } catch (error) {
+    console.error('Error al obtener siguiente publicación:', error);
+    res.status(500).json({ error: 'Error interno del servidor.' });
+  }
+};
