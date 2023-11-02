@@ -66,6 +66,19 @@ export const getPerfilUsuario = async (req, res) => {
       [idUsuario]
     );
 
+    const [rowsPublicacionFav] = await pool.query(
+      `SELECT 
+        publicacion.*,
+        COUNT(megusta.idUsuario) AS likesCount
+      FROM publicacion
+      LEFT JOIN megusta ON publicacion.idPublicacion = megusta.idPublicacion
+      WHERE publicacion.idUsuario = ?
+      GROUP BY publicacion.idPublicacion
+      ORDER BY likesCount DESC
+      LIMIT 1`,
+      [idUsuario]
+    );
+
     const [rowsSeguidos] = await pool.query(
       'SELECT COUNT(*) AS numSeguidos FROM sigue WHERE idUsuarioSigue = ?',
       [idUsuario]
@@ -90,6 +103,7 @@ export const getPerfilUsuario = async (req, res) => {
         attachedFile: row.attachedFile,
         isEvent: row.isEvent
       })),
+      publicacionDestacada: rowsPublicacionFav[0]
     };
 
     console.log(usuarioConPublicaciones);
