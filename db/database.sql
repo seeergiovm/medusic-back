@@ -68,6 +68,9 @@ CREATE TABLE Notificacion (
     sendDate DATETIME,
     content TEXT,
     typeContent VARCHAR(255),
+    isRead VARCHAR(10),
+    idPublicacionLike INT,
+    idUsuarioFollow INT,
     idUsuario INT,
     FOREIGN KEY (idUsuario) REFERENCES Usuario(idUsuario) ON DELETE CASCADE
 );

@@ -151,15 +151,32 @@ export const addFollow = async (req, res) => {
 
     console.log(idUsuarioLogged, idUsuarioOtro)
 
-    let result;
+    let resultFollow;
 
-    [result] = await pool.query(`INSERT INTO sigue (
+    [resultFollow] = await pool.query(`INSERT INTO sigue (
       idUsuarioSigue, idUsuarioSeguido
     ) 
     VALUES (?, ?)`, 
     [idUsuarioLogged, idUsuarioOtro]);
 
-    console.log(result);
+    console.log(resultFollow);
+
+    const [resultUsername] = await pool.query(
+      'SELECT username FROM usuario WHERE idUsuario = ?',
+      [idUsuarioLogged]
+    );
+
+    const usernameLogged = resultUsername[0].username;
+
+    const notificationContent = `<strong>${usernameLogged}</strong> ha comenzado a seguirte.`;
+
+    // Insertar la notificación en la tabla Notificacion
+    const [resultNotification] = await pool.query(
+      `INSERT INTO notificacion 
+        (sendDate, content, typeContent, idUsuario, isRead, idUsuarioFollow) 
+        VALUES (NOW(), ?, 'follow', ?, 'No', ?)`,
+      [notificationContent, idUsuarioOtro, idUsuarioLogged]
+    );
 
     res.send({message:'OK: addFollow'});
 

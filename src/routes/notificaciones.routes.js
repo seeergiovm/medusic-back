@@ -4,6 +4,6 @@ import { getNotificaciones}
 
 const router = Router()
 
-router.get('/getNotificaciones/:id', getNotificaciones)
+router.get('/notificaciones/:idUsuario', getNotificaciones)
 
 export default router

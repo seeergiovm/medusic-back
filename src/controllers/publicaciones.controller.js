@@ -103,19 +103,38 @@ export const verifyLike = async (req, res) => {
 export const addLike = async (req, res) => {
 
   try {
-    const { idUsuario, idPublicacion } = req.body;
+    const { idUsuario, idPublicacion, idUsuarioPublicacion } = req.body;
 
-    console.log(idUsuario, idPublicacion)
+    console.log(idUsuario, idPublicacion, idUsuarioPublicacion)
 
-    let result;
+    let resultLike;
 
-    [result] = await pool.query(`INSERT INTO megusta (
+    [resultLike] = await pool.query(`INSERT INTO megusta (
       idUsuario, idPublicacion
     ) 
     VALUES (?, ?)`, 
     [idUsuario, idPublicacion]);
 
-    console.log(result);
+    console.log(resultLike);
+
+    const [resultUsername] = await pool.query(
+      'SELECT username FROM usuario WHERE idUsuario = ?',
+      [idUsuario]
+    );
+
+    const usernameLogged = resultUsername[0].username;
+
+    const notificationContent = `<strong>${usernameLogged}</strong> ha dado me gusta a tu publicación.`;
+
+    // Insertar la notificación en la tabla Notificacion
+    const [resultNotification] = await pool.query(
+      `INSERT INTO notificacion 
+        (sendDate, content, typeContent, idUsuario, isRead, idPublicacionLike) 
+        VALUES (NOW(), ?, 'like', ?, 'No', ?)
+      `,
+      [notificationContent, idUsuarioPublicacion, idPublicacion]
+    );
+
 
     res.send({message:'OK: addLike'});
 
