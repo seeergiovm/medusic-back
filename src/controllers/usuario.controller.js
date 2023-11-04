@@ -116,6 +116,48 @@ export const getPerfilUsuario = async (req, res) => {
   }
 };
 
+// Devuelve la lista de usuarios seguidos por el usuario loggeado
+export const getListaSeguidos = async (req, res) => {
+  try {
+    const {idUsuario} = req.params;
+
+    const [result] = await pool.query(`SELECT usuario.idUsuario, usuario.username, usuario.profilePicture
+    FROM sigue
+    JOIN usuario ON sigue.idUsuarioSeguido = usuario.idUsuario
+    WHERE sigue.idUsuarioSigue = ?`, 
+    [idUsuario]);
+
+    console.log(result)
+
+    res.send(result)
+
+  } catch (error) {
+    console.error('Error al verificar el login:', error);
+    res.status(500).json({ error: 'Error interno del servidor.' });
+  }
+}
+
+// Devuelve la lista de usuarios que siguen al usuario loggeado
+export const getListaSeguidores = async (req, res) => {
+  try {
+    const {idUsuario} = req.params;
+
+    const [result] = await pool.query(`SELECT usuario.idUsuario, usuario.username, usuario.profilePicture
+      FROM sigue
+      JOIN usuario ON sigue.idUsuarioSigue = usuario.idUsuario
+      WHERE sigue.idUsuarioSeguido = ?`, 
+    [idUsuario]);
+
+    console.log(result)
+
+    res.send(result)
+
+  } catch (error) {
+    console.error('Error al verificar el login:', error);
+    res.status(500).json({ error: 'Error interno del servidor.' });
+  }
+}
+
 // Verifica si un usuario ha dado seguir a otro usuario
 export const verifyFollow = async (req, res) => {
 
@@ -125,7 +167,7 @@ export const verifyFollow = async (req, res) => {
     console.log(idUsuarioLogged, idUsuarioOtro)
 
     const [rows] = await pool.query(
-      `SELECT * FROM Sigue WHERE idUsuarioSigue = ? AND idUsuarioSeguido = ?`,
+      `SELECT * FROM Sigue WHERE idUsuarioSigue = ? AND idUsuarioSeguido = ? `,
       [idUsuarioLogged, idUsuarioOtro]
     );
 

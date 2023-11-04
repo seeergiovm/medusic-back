@@ -2,7 +2,7 @@ import {Router} from 'express'
 
 import { getUsuario, createUsuario, updateUsuario, deleteUsuario, login, 
   buscarUsuarios, getPerfilUsuario, subirImagen, recoverPassword, updatePassword,
-  verifyFollow, addFollow, removeFollow} 
+  verifyFollow, addFollow, removeFollow, getListaSeguidos, getListaSeguidores} 
   from '../controllers/usuario.controller.js'
 
 const router = Router()
@@ -11,6 +11,10 @@ const router = Router()
 router.get('/usuario/get/:idUsuario', getUsuario);
 
 router.get('/usuario/perfil/:idUsuario', getPerfilUsuario);
+
+router.get('/usuario/get-seguidos/:idUsuario', getListaSeguidos);
+
+router.get('/usuario/get-seguidores/:idUsuario', getListaSeguidores);
 
 router.post('/usuario/verify-follow', verifyFollow);
 
