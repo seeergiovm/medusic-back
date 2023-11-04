@@ -31,7 +31,8 @@ export const getListConversaciones = async (req, res) => {
         c.idUsuarioReceptor,
         eReceptor.username as usernameReceptor,
         eReceptor.profilePicture as profilePictureReceptor,
-        c.leido AS mensajesLeidos
+        c.leido AS mensajesLeidos,
+        c.sendDate
       FROM Conversa c
       LEFT JOIN Usuario eEmisor ON c.idUsuarioEmisor = eEmisor.idUsuario
       LEFT JOIN Usuario eReceptor ON c.idUsuarioReceptor = eReceptor.idUsuario
@@ -40,13 +41,14 @@ export const getListConversaciones = async (req, res) => {
           SELECT MAX(sendDate)
           FROM Conversa
           WHERE (idUsuarioEmisor = c.idUsuarioEmisor AND idUsuarioReceptor = c.idUsuarioReceptor)
-            OR (idUsuarioEmisor = c.idUsuarioReceptor AND idUsuarioReceptor = c.idUsuarioEmisor))`,
+            OR (idUsuarioEmisor = c.idUsuarioReceptor AND idUsuarioReceptor = c.idUsuarioEmisor)
+        )
+      ORDER BY c.sendDate DESC`,
       [idUsuario, idUsuario]
     );
 
     const conversaciones = [];
     const uniqueConversations = new Set();
-    let leido;
 
     rows.forEach(row => {
       // Ordenar los identificadores de usuario para evitar duplicados
