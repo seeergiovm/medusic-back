@@ -306,6 +306,8 @@ export const getPublicacionExplorar = async (req, res) => {
       [idUsuarioLogged, ...idsVistos]
     );
 
+    let siguientePublicacion;
+
     if (resultPublicaciones.length === 0) {
       const [resultPublicaciones2] = await pool.query(
         `SELECT 
@@ -330,9 +332,12 @@ export const getPublicacionExplorar = async (req, res) => {
         res.status(404).json({ message: 'No hay publicaciones posteriores.' });
         return;
       }
+      siguientePublicacion = resultPublicaciones2[0];
+
+    } else {
+      siguientePublicacion = resultPublicaciones[0];
     }
 
-    const siguientePublicacion = resultPublicaciones[0];
     const idPublicacion = siguientePublicacion.idPublicacion;
 
     const [rowsComentarios] = await pool.query(
