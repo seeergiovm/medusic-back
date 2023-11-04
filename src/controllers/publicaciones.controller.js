@@ -185,9 +185,14 @@ export const addComentario = async (req, res) => {
     VALUES (?, ?, ?, ?)`, 
     [idUsuario, idPublicacion, comment, commentDate]);
 
-    console.log(result)
+    const [resultUsername] = await pool.query(
+      'SELECT username FROM usuario WHERE idUsuario = ?',
+      [idUsuario]
+    );
 
-    res.send({message:'OK'})
+    console.log(resultUsername[0])
+
+    res.send({message:'OK', username: resultUsername[0].username})
 
   } catch (error) { 
     console.error('Error al crear un comentario:', error);
