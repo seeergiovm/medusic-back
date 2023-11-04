@@ -34,6 +34,7 @@ CREATE TABLE Conversa (
     idUsuarioReceptor INT,
     sendDate DATETIME,
     mensaje TEXT,
+    leido VARCHAR(10),
     FOREIGN KEY (idUsuarioEmisor) REFERENCES Usuario(idUsuario),
     FOREIGN KEY (idUsuarioReceptor) REFERENCES Usuario(idUsuario)
 );

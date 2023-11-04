@@ -1,12 +1,14 @@
-import express from 'express'
-import cors from 'cors'
+import express from 'express';
+import cors from 'cors';
 // import bodyParser from 'body-parser'
 import path from 'path';
 
 //Routes
-import usuarioRoutes from './routes/usuario.routes.js'
-import notificacionesRoutes from './routes/notificaciones.routes.js'
-import publicacionesRoutes from './routes/publicaciones.routes.js'
+import usuarioRoutes from './routes/usuario.routes.js';
+import notificacionesRoutes from './routes/notificaciones.routes.js';
+import publicacionesRoutes from './routes/publicaciones.routes.js';
+import chatsRoutes from './routes/chats.routes.js';
+
 
 const app = express();
 
@@ -19,6 +21,8 @@ app.use(cors());
 app.use(usuarioRoutes);
 app.use(notificacionesRoutes);
 app.use(publicacionesRoutes);
+app.use(chatsRoutes);
+
 
 app.listen(3000);
 console.log('Server running on port 3000');
