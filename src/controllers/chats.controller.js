@@ -35,12 +35,18 @@ export const getListConversaciones = async (req, res) => {
       FROM Conversa c
       LEFT JOIN Usuario eEmisor ON c.idUsuarioEmisor = eEmisor.idUsuario
       LEFT JOIN Usuario eReceptor ON c.idUsuarioReceptor = eReceptor.idUsuario
-      WHERE (c.idUsuarioEmisor = ? OR c.idUsuarioReceptor = ?) `,
+      WHERE (c.idUsuarioEmisor = ? OR c.idUsuarioReceptor = ?)
+        AND c.sendDate = (
+          SELECT MAX(sendDate)
+          FROM Conversa
+          WHERE (idUsuarioEmisor = c.idUsuarioEmisor AND idUsuarioReceptor = c.idUsuarioReceptor)
+            OR (idUsuarioEmisor = c.idUsuarioReceptor AND idUsuarioReceptor = c.idUsuarioEmisor))`,
       [idUsuario, idUsuario]
     );
 
     const conversaciones = [];
     const uniqueConversations = new Set();
+    let leido;
 
     rows.forEach(row => {
       // Ordenar los identificadores de usuario para evitar duplicados
@@ -52,6 +58,7 @@ export const getListConversaciones = async (req, res) => {
       // Verificar si ya existe esta conversación en la lista
       if (!uniqueConversations.has(conversationKey)) {
         uniqueConversations.add(conversationKey);
+        //Marca como leído si el último mensaje no leído lo ha realizado el usuario loggeado
 
         const conversacion = {
           idUsuarioEmisor: row.idUsuarioEmisor,
@@ -60,7 +67,7 @@ export const getListConversaciones = async (req, res) => {
           idUsuarioReceptor: row.idUsuarioReceptor,
           usernameReceptor: row.usernameReceptor,
           profilePictureReceptor: row.profilePictureReceptor,
-          mensajesLeidos: row.mensajesLeidos
+          mensajesLeidos: (idUsuario == row.idUsuarioEmisor) ? 'Si' : row.mensajesLeidos
         };
 
         conversaciones.push(conversacion);
