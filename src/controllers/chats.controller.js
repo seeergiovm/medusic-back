@@ -7,7 +7,8 @@ export const enviarMensaje = async (req, res) => {
 
     // Realiza la inserción del mensaje en la base de datos
     const [result] = await pool.query(
-      `INSERT INTO Conversa (idUsuarioEmisor, idUsuarioReceptor, mensaje, sendDate, leido) VALUES (?, ?, ?, NOW(), 'No')`,
+      `INSERT INTO Conversa (idUsuarioEmisor, idUsuarioReceptor, mensaje, sendDate, leido) 
+        VALUES (?, ?, ?, NOW(), 'No')`,
       [idUsuarioEmisor, idUsuarioReceptor, mensaje]
     );
 
@@ -117,3 +118,74 @@ export const checkMessages = async (req, res) => {
     res.status(500).json({ error: 'Error interno del servidor' });
   }
 };
+
+// Verifica si un usuario ha solicitado colaborar con otro usuario con anterioridad
+export const verifyCollaboration = async (req, res) => {
+
+  try {
+    const { idUsuarioLogged, idUsuarioOtro } = req.body;
+
+    console.log(idUsuarioLogged, idUsuarioOtro)
+
+    const [rows] = await pool.query(
+      `SELECT * FROM Conversa
+      WHERE (idUsuarioEmisor = ? AND idUsuarioReceptor = ?)
+        AND (mensaje = '¡Me gustaría colaborar contigo!')`,
+      [idUsuarioLogged, idUsuarioOtro]
+    );
+
+    console.log(rows)
+
+    if(rows.length > 0) {
+      res.send({ hasCollaboration: true });
+    } else {
+      res.send({ hasCollaboration: false });
+    }
+
+  } catch (error) { 
+    console.error('Error al verificar la colaboración:', error);
+    res.status(500).json({ error: 'Error interno del servidor.' });
+  }
+}
+
+// Crea una conversación para que puedan comunicarse dos usuarios artistas
+export const createChat = async (req, res) => {
+
+  try {
+    const { idUsuarioLogged, idUsuarioOtro } = req.body;
+
+    console.log(idUsuarioLogged, idUsuarioOtro)
+    let mensaje = '¡Me gustaría colaborar contigo!';
+
+    const [result] = await pool.query(
+      `INSERT INTO Conversa (idUsuarioEmisor, idUsuarioReceptor, mensaje, sendDate, leido) 
+        VALUES (?, ?, ?, NOW(), 'No')`,
+      [idUsuarioLogged, idUsuarioOtro, mensaje]
+    );
+
+    console.log(result)
+
+    const [resultUsername] = await pool.query(
+      'SELECT username FROM usuario WHERE idUsuario = ?',
+      [idUsuarioLogged]
+    );
+
+    const usernameLogged = resultUsername[0].username;
+
+    const notificationContent = `A <strong>${usernameLogged}</strong> le gustaría colaborar contigo.`;
+
+    // Insertar la notificación en la tabla Notificacion
+    const [resultNotification] = await pool.query(
+      `INSERT INTO notificacion 
+        (sendDate, content, typeContent, idUsuario, isRead, idUsuarioFollow) 
+        VALUES (NOW(), ?, 'follow', ?, 'No', ?)`,
+      [notificationContent, idUsuarioOtro, idUsuarioLogged]
+    );
+
+    res.send({ message: 'Ok' });
+
+  } catch (error) { 
+    console.error('Error al verificar la colaboración:', error);
+    res.status(500).json({ error: 'Error interno del servidor.' });
+  }
+}
