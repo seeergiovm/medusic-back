@@ -2,7 +2,8 @@ import {Router} from 'express'
 
 import { getUsuario, createUsuario, updateUsuario, deleteUsuario, login, 
   buscarUsuarios, getPerfilUsuario, subirImagen, recoverPassword, updatePassword,
-  verifyFollow, addFollow, removeFollow, getListaSeguidos, getListaSeguidores} 
+  verifyFollow, addFollow, removeFollow, getListaSeguidos, getListaSeguidores,
+  resetPassword} 
   from '../controllers/usuario.controller.js'
 
 const router = Router()
@@ -37,5 +38,8 @@ router.post('/login', login);
 router.get('/usuario/buscar/:termino/:idUsuarioLoggeado', buscarUsuarios);
 
 router.get('/recover-password/:mail', recoverPassword);
+
+router.post('/reset-password', resetPassword);
+
 
 export default router

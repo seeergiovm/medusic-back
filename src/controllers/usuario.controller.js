@@ -1,6 +1,8 @@
 import {pool} from '../db.js'
 import { generateToken, sendPasswordResetEmail } from '../utils/authUtils.js'
-
+import bcrypt from 'bcrypt'
+import { secretKey } from '../utils/authUtils.js'
+import jwt from 'jsonwebtoken';
 
 //PRUEBA
 //Añade una imagen asociada a un usuario a la BD
@@ -261,6 +263,10 @@ export const createUsuario = async (req, res) => {
   try {
     const {username, fullname, password, rol, mail, birthday, country, profilePicture, biography, creationDate} = req.body;
 
+    console.log(req.body)
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     let result;
     if(rol === 'artista') {
       const {artisticName, dedication, musicalGenres} = req.body;
@@ -270,7 +276,7 @@ export const createUsuario = async (req, res) => {
         creationDate, artisticName, dedication, musicalGenres
       ) 
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, 
-      [username, fullname, password, rol, mail, birthday, country, profilePicture, biography, creationDate, artisticName, dedication, musicalGenres]);
+      [username, fullname, hashedPassword, rol, mail, birthday, country, profilePicture, biography, creationDate, artisticName, dedication, musicalGenres]);
 
     } else {
       const {favsArtists} = req.body;
@@ -280,7 +286,7 @@ export const createUsuario = async (req, res) => {
         creationDate, favsArtists
       ) 
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, 
-      [username, fullname, password, rol, mail, birthday, country, profilePicture, biography, creationDate, favsArtists]);
+      [username, fullname, hashedPassword, rol, mail, birthday, country, profilePicture, biography, creationDate, favsArtists]);
     }
 
     console.log(result)
@@ -350,12 +356,18 @@ export const updatePassword = async (req, res) => {
 
     console.log('Introducida:' + oldPassword +' real:' + rows[0].passw);
     
-    if(!rows.length ||oldPassword !== rows[0].passw) {
+    const compareHashPassword = await bcrypt.compare(oldPassword, rows[0].passw);
+
+    console.log(compareHashPassword);
+
+    if(!rows.length || !compareHashPassword) {
       return res.status(200).json({ message: 'La contraseña actual no es correcta.' });
     }
 
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
     [result] = await pool.query(`UPDATE usuario SET passw=? WHERE (idUsuario=?)`,
-      [newPassword, idUsuario]);
+      [hashedNewPassword, idUsuario]);
 
     console.log(result)
 
@@ -415,10 +427,16 @@ export const login = async (req, res) => {
     const [rows] = await pool.query(`
       SELECT *
       FROM usuario
-      WHERE username=? AND passw=?`,
-      [username, password]);
+      WHERE username=?`,
+      [username]);
 
     if (rows.length === 0) {
+      return res.status(401).json({ error: 'Credenciales incorrectas' });
+    }
+
+    const compareHashPassword = await bcrypt.compare(password, rows[0].passw);
+
+    if (!compareHashPassword) {
       return res.status(401).json({ error: 'Credenciales incorrectas' });
     }
 
@@ -446,7 +464,7 @@ export const recoverPassword = async (req, res) => {
 
 
     const [rows] = await pool.query(`
-      SELECT username, fullname, passw FROM usuario WHERE mail=?`,
+      SELECT idUsuario, username, fullname, passw FROM usuario WHERE mail=?`,
       [mail]);
 
     if (rows.length === 0) {
@@ -455,6 +473,7 @@ export const recoverPassword = async (req, res) => {
 
     let datosLogin = rows[0];
 
+
     await sendPasswordResetEmail(mail, datosLogin);
 
     res.status(200).json({ message: 'Se ha enviado un correo electrónico con los datos de su cuenta' });
@@ -462,6 +481,41 @@ export const recoverPassword = async (req, res) => {
     console.error(error);
     res.status(500).json({ error: 'Error interno del servidor.' });
   }
+};
+
+// Enviar correo con los datos de inicio de sesión
+export const resetPassword = async (req, res) => {
+    const resetToken = req.body.resetToken;
+    const newPassword = req.body.newPassword;
+
+    console.log(resetToken)
+
+    jwt.verify(resetToken, secretKey, async (err, decoded) => {
+      if (err) {
+        return res.status(401).json({ error: 'Token inválido o caducado' });
+      }
+  
+      // El token es válido, se puede acceder a los datos del usuario desde "decoded"
+      const idUsuario = decoded.idUsuario;
+  
+      console.log(idUsuario)
+      try {
+        const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+  
+        const [rows] = await pool.query(`UPDATE usuario SET passw=? WHERE idUsuario=?`
+          , [hashedNewPassword, idUsuario]);
+
+        console.log(rows)
+        if (rows.affectedRows === 0) {
+          return res.status(200).json({ error: 'No se ha actualizado lacontraseña' });
+        }
+  
+        res.json({ message: 'Contraseña actualizada exitosamente' });
+      } catch (error) {
+        console.error('Error al actualizar la contraseña:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+      }
+    });
 };
 
 // Busqueda filtrada de usuarios por nombre de usuario
@@ -483,6 +537,8 @@ export const buscarUsuarios = async (req, res) => {
     res.status(500).json({ error: 'Error interno del servidor.' });
   }
 };
+
+
 
 
 
