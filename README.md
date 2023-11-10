@@ -1,26 +1,26 @@
-**# Configuración del Back-end**
+# Configuración del Back-end
 
 Esta guía proporciona los pasos necesarios para configurar el back-end.
 
-**## Requisitos previos**
+## Requisitos previos
 
 - [Node.js](https://nodejs.org/)
 - [npm](https://www.npmjs.com/)
 
-**## Configuración**
+## Configuración
 
-**### 1. Clona este repositorio:**
+### 1. Clona este repositorio:
 
   git clone https://github.com/seeergiovm/medusic-back.git
 
-**### 2. Instala las dependencias si no vienen instaladas:**
+### 2. Instala las dependencias si no vienen instaladas:
 
   cd <nombre_carpeta_proyecto> ('medusic-back' o similar)
   npm install
 
-**### 3. Configura la base de datos.**
+### 3. Configura la base de datos.
 
-**### 4. Iniciar el servidor.**
+### 4. Iniciar el servidor.
 
 Una vez tengas configurada la base de datos, puedes ejecutar:
   
@@ -30,18 +30,18 @@ El servidor se ejecutará en http://localhost:3000 por defecto.
 
 
 
-**# Configuración de la Base de Datos**
+# Configuración de la Base de Datos
 
 Esta guía proporciona los pasos necesarios para configurar la base de datos.
 
-**## Requisitos previos**
+## Requisitos previos
 
 Asegúrate de tener instalado:
 - [MySQL](https://www.mysql.com/) o tu sistema de gestión de bases de datos preferido.
 
-**## Pasos de Configuración**
+## Pasos de Configuración
 
-**### 1. Crear la Base de Datos**
+### 1. Crear la Base de Datos
 
 Ejecuta el siguiente script SQL para crear la base de datos necesaria para la aplicación.
 El script se encuentra en: '/db/database.sql'
