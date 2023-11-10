@@ -21,11 +21,12 @@ CREATE TABLE Usuario (
     favsArtists VARCHAR(255)
 );
 
-INSERT INTO Usuario (username, fullname, passw, rol, mail, birthday, country, biography,
-    profilePicture, creationDate, artisticName, dedication, musicalGenres, favsArtists)
-    VALUES ('sergiovm', 'Sergio Vargas Martín', 'password', 'artista', 'sergiovargas@correo.ugr.es',
-    '1998-02-06', 'España', 'Sergio es un talentoso y apasionado artista español conocido por su habilidad para fusionar diversos elementos artísticos y explorar nuevas formas de expresión. Nació en Almería, y desde temprana edad mostró un profundo interés por la música.',
-    'rutaImagen', '2023-10-15', 'Sergix', 'Cantante', 'Pop, Rock', NULL);
+-- INSERT INTO Usuario (username, fullname, passw, rol, mail, birthday, country, biography,
+--     profilePicture, creationDate, artisticName, dedication, musicalGenres, favsArtists)
+--     VALUES ('sergiovm', 'Sergio Vargas Martín', 'password', 'artista', 'sergiovargas@correo.ugr.es',
+--     '1998-02-06', 'España', 'Sergio es un talentoso y apasionado artista español conocido por su habilidad para fusionar diversos elementos artísticos y explorar nuevas formas de expresión. Nació en Almería, y desde temprana edad mostró un profundo interés por la música.',
+--     'rutaImagen', '2023-10-15', 'Sergix', 'Cantante', 'Pop, Rock', NULL);
+
 
 -- Tabla de Conversaciones
 CREATE TABLE Conversa (
@@ -39,29 +40,6 @@ CREATE TABLE Conversa (
     FOREIGN KEY (idUsuarioReceptor) REFERENCES Usuario(idUsuario)
 );
 
--- Tabla de Eventos
-CREATE TABLE Evento (
-    idEvento INT PRIMARY KEY AUTO_INCREMENT,
-    publicationDate DATE,
-    startDate DATETIME,
-    ubication VARCHAR(255),
-    musicalGenres VARCHAR(255),
-    descripcion TEXT,
-    img MEDIUMTEXT,
-    ticketLink VARCHAR(500),
-    idUsuario INT,
-    FOREIGN KEY (idUsuario) REFERENCES Usuario(idUsuario)
-);
-
--- Tabla de Ubicación de Evento
-CREATE TABLE UbicacionEvento (
-    idUbicacionEvento INT PRIMARY KEY AUTO_INCREMENT,
-    country VARCHAR(255),
-    city VARCHAR(255),
-    place VARCHAR(255),
-    idEvento INT,
-    FOREIGN KEY (idEvento) REFERENCES Evento(idEvento)
-);
 
 -- Tabla de Notificaciones
 CREATE TABLE Notificacion (

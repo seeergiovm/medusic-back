@@ -9,10 +9,8 @@ export const getNotificaciones = async (req, res) => {
     [idUsuario]);
 
     if (rows.length === 0) {
-      return res.status(401).json({ error: 'No tienes notificaciones.' });
+      return res.status(400).json({ error: 'No tienes notificaciones' });
     }
-
-    // const notificaciones = rows
 
     // Procesar las notificaciones para obtener información adicional
     const notificaciones = await Promise.all(

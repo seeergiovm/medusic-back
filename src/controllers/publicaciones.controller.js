@@ -6,8 +6,6 @@ export const createPublicacion = async (req, res) => {
   try {
     const { publicationDate, descripcion, attachedFile, isEvent, idUsuario } = req.body;
 
-    console.log(publicationDate, descripcion, attachedFile, isEvent, idUsuario)
-
     let result;
 
     [result] = await pool.query(`INSERT INTO publicacion (
@@ -287,8 +285,7 @@ export const getPublicacionExplorar = async (req, res) => {
   try {
     const { idUsuarioLogged, idsVistos} = req.body;
 
-    console.log('explorar')
-    //Control de no repetir publicaciones ya vistas
+    //Control para no repetir publicaciones ya vistas
     const exclusionCondition = idsVistos.length > 0 ? `AND publicacion.idPublicacion NOT IN (${idsVistos.map(() => "?").join(",")})` : "";
 
     // Obtener la publicación
