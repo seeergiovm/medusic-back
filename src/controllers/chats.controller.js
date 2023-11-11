@@ -189,3 +189,27 @@ export const createChat = async (req, res) => {
     res.status(500).json({ error: 'Error interno del servidor.' });
   }
 }
+
+// Crea una conversación para que puedan comunicarse dos usuarios artistas
+export const deleteChat = async (req, res) => {
+
+  try {
+    const { idUsuarioLogged, idUsuarioConversa } = req.body;
+
+    console.log(idUsuarioLogged, idUsuarioConversa)
+
+    const [result] = await pool.query(
+      `DELETE FROM conversa WHERE (idUsuarioEmisor = ? AND idUsuarioReceptor = ?) 
+      OR (idUsuarioEmisor = ? AND idUsuarioReceptor = ?)`,
+      [idUsuarioLogged, idUsuarioConversa, idUsuarioConversa, idUsuarioLogged]
+    );
+
+    console.log(result)
+
+    res.send({ message: 'Conversación eliminada con éxito' });
+
+  } catch (error) { 
+    console.error('Error al eliminar la conversación:', error);
+    res.status(500).json({ error: 'Error interno del servidor.' });
+  }
+}

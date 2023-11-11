@@ -1,7 +1,7 @@
 import {Router} from 'express'
 
 import { checkMessages, createChat, enviarMensaje, getConversacion, getListConversaciones,
-  verifyCollaboration } 
+  verifyCollaboration, deleteChat } 
   from '../controllers/chats.controller.js'
 
 const router = Router()
@@ -17,6 +17,8 @@ router.get('/chats/marcar-leidos/:idUsuarioEmisor/:idUsuarioReceptor', checkMess
 router.post('/chats/verify-collaboration', verifyCollaboration);
 
 router.post('/chats/create-chat', createChat);
+
+router.post('/chats/delete-chat', deleteChat);
 
 
 export default router;
