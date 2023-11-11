@@ -52,7 +52,3 @@ Accede al archivo de configuración de la conexión a la base de datos y proporc
 de conexión, el nombre de usuario y la contraseña.
 
 El archivo se encuentra en la ruta: '/src/db.js'
-
-### 3. (Opcional) Añadir usuario
-
-Si desea añadir un usuario por defecto ejecute el siguiente script: '/db/usuario.sql'.
