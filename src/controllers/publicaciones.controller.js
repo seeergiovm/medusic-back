@@ -138,7 +138,6 @@ export const addLike = async (req, res) => {
 
   } catch (error) { 
     console.error('Error al agregar like:', error);
-    // res.status(500).json({ error: 'Error interno del servidor: Error al agregar un like' });
   }
 }
 

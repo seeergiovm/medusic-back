@@ -4,7 +4,6 @@ import bcrypt from 'bcrypt'
 import { secretKey } from '../utils/authUtils.js'
 import jwt from 'jsonwebtoken';
 
-//PRUEBA
 //Añade una imagen asociada a un usuario a la BD
 export const subirImagen = async (req, res) => {
   try {
@@ -34,7 +33,6 @@ export const subirImagen = async (req, res) => {
 }
 
 
-// CONTROL PETICIONES
 // Devuelve info del usuario a traves de su ID (para editar perfil)
 export const getUsuario = async (req, res) => {
   try {
@@ -226,7 +224,6 @@ export const addFollow = async (req, res) => {
 
   } catch (error) { 
     console.error('Error al agregar follow:', error);
-    // res.status(500).json({ error: 'Error interno del servidor: Error al agregar un follow' });
   }
 }
 
